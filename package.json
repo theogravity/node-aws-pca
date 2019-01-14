@@ -1,0 +1,72 @@
+{
+  "name": "aws-pca",
+  "version": "1.0.0",
+  "description": "A library to generate a certificate for HTTPS use using AWS Private Certificate Authority (PCA)",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "babel src -d lib",
+    "test": "jest",
+    "lint-staged": "lint-staged",
+    "prepublishOnly": "jest && babel src -d lib",
+    "prepare-publish": "npm run changelog:verify && version-bump && npm run changelog:release",
+    "version-bump": "version-bump",
+    "changelog:help": "changelog-version",
+    "changelog:verify": "changelog-version verify",
+    "changelog:prepare": "changelog-version prepare",
+    "changelog:release": "changelog-version release"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theogravity/node-aws-pca.git"
+  },
+  "author": "Theo Gravity <theo@suteki.nu>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/theogravity/node-aws-pca/issues"
+  },
+  "homepage": "https://github.com/theogravity/node-aws-pca#readme",
+  "keywords": ["aws", "pca", "acm", "https", "ssl"],
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
+    "@babel/preset-env": "^7.2.3",
+    "@theo.gravity/changelog-version": "^2.1.8",
+    "@theo.gravity/version-bump": "^1.1.1",
+    "aws-sdk": "^2.387.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
+    "jest": "^23.6.0",
+    "jest-junit-reporter": "^1.1.0",
+    "lint-staged": "^8.1.0",
+    "pem": "^1.13.2",
+    "pre-commit": "^1.2.2",
+    "prettier-standard": "^8.0.1",
+    "regenerator-runtime": "^0.13.1",
+    "standard": "^12.0.1"
+  },
+  "dependencies": {},
+  "lint-staged": {
+    "src/**/*.js": [
+      "prettier-standard",
+      "git add"
+    ]
+  },
+  "pre-commit": [
+    "lint-staged",
+    "test",
+    "build"
+  ],
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
+    "testResultsProcessor": "./node_modules/jest-junit-reporter",
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/lib"
+    ]
+  }
+}
