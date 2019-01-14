@@ -59,7 +59,8 @@ export default class PCA {
    */
 
   /**
-   * Wrapper around ACMPCA#issueCertificate()
+   * Wrapper around ACMPCA#issueCertificate() and calls ACMPCA#waitFor() to ensure it has been
+   * created so getCertificate() can be subsequently called
    *
    * Creates the certificate using the AWS PCA, storing it in AWS.
    *
@@ -70,13 +71,37 @@ export default class PCA {
    * @returns {Promise<IssueCertificateRes>}
    */
   async issueCertificate (csr, params) {
-    return this.acmpca
-      .issueCertificate({
-        CertificateAuthorityArn: this.caArn,
-        ...params,
-        Csr: Buffer.from(csr, 'ascii')
-      })
-      .promise()
+    return new Promise(async (resolve, reject) => {
+      try {
+        const caData = await this.acmpca
+          .issueCertificate({
+            CertificateAuthorityArn: this.caArn,
+            ...params,
+            Csr: Buffer.from(csr, 'ascii')
+          })
+          .promise()
+
+        this.acmpca.waitFor(
+          'certificateIssued',
+          {
+            CertificateAuthorityArn: this.caArn,
+            CertificateArn: caData.CertificateArn
+          },
+          (err, data) => {
+            if (err) {
+              return reject(err)
+            }
+
+            resolve({
+              ...caData,
+              ...data
+            })
+          }
+        )
+      } catch (e) {
+        reject(e)
+      }
+    })
   }
 
   /**

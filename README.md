@@ -46,7 +46,8 @@ export async function sample () {
 
   // Create the server certificate
   // See https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/ACMPCA.html#issueCertificate-property
-  // no need to specify CertificateAuthorityArn since you specified it in the constructor
+  // - no need to specify CertificateAuthorityArn since you specified it in the constructor
+  // - also waits for the issue certificate task on AWS to complete (this takes around 5+ secs)
 
   const issueData = await pca.issueCertificate(csrData.csr, {
     SigningAlgorithm: 'SHA256WITHRSA',
@@ -56,10 +57,10 @@ export async function sample () {
     }
   })
 
-  // Get the server certificate
-  // Note: You might have to wait a few seconds if you just issued the certificate
-  // before you can fetch it as AWS PCA has not actually created it yet
+  // issueData will have { CertificateArn, Certificate, CertificateChain }
+  // You can technically stop here as you have the Certificate + CertificateChain data
 
+  // Get the server certificate (not needed if you've just called issueCertificate()
   const certData = await pca.getCertificate(issueData.CertificateArn)
 
   // certData will have { Certificate, CertificateChain }
