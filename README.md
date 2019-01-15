@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/aws-pca.svg)](https://badge.fury.io/js/aws-pca)
 
-A library to generate and fetch a certificate for HTTPS use using AWS Private Certificate Authority (PCA).
+A library to generate and fetch a certificate for HTTPS use using [AWS Private Certificate Authority (PCA)](https://aws.amazon.com/certificate-manager/private-certificate-authority/).
 
 ## Install
 
