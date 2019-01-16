@@ -1,6 +1,6 @@
 {
   "name": "aws-pca",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "A library to generate a certificate for HTTPS use using AWS Private Certificate Authority (PCA)",
   "main": "lib/index.js",
   "scripts": {
@@ -25,7 +25,13 @@
     "url": "https://github.com/theogravity/node-aws-pca/issues"
   },
   "homepage": "https://github.com/theogravity/node-aws-pca#readme",
-  "keywords": ["aws", "pca", "acm", "https", "ssl"],
+  "keywords": [
+    "aws",
+    "pca",
+    "acm",
+    "https",
+    "ssl"
+  ],
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",

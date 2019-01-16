@@ -9,68 +9,54 @@ A library to generate and fetch a certificate for HTTPS use using [AWS Private C
 Required:
 
 - [aws-sdk](https://www.npmjs.com/package/aws-sdk) for calling AWS
-- [pem](https://www.npmjs.com/package/pem) for generating CSRs (Certificate Signing Requests)
 
-`npm i aws-pca pem aws-sdk`
+`npm i aws-pca aws-sdk`
 
 ## Usage
 
+For more documentation, see source code and tests in `src/`
+
 ```js
-import AWS from 'aws-sdk'
-import pem from 'pem'
-import { PCA } from 'aws-pca'
+// The following has been personally tested to work
+
+const AWS = require('aws-sdk')
+const PCA = require('aws-pca').PCA
 
 export async function sample () {
-  // See https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/ACMPCA.html#constructor-property
-  // for possible options
-  const acmpca = new AWS.ACMPCA()
-
   // The value of your CA (Certificate Authority) ARN in AWS PCA
   const CA_ARN = 'arn:aws:acm-pca:us-west-2:123456789012:certificate-authority/4819f73f-af7c-4abf-8753-62e40512cac6'
 
-  const pca = new PCA(acmpca, pem, CA_ARN)
-
-  // Create a CSR + client key which will be used to issue a certificate
-  // See https://www.deineagentur.com/projects/pem/module-pem.html#.createCSR
-
-  const csrData = await pca.createCSR({
-    hash: 'sha256',
-    country: 'US',
-    state: 'California',
-    locality: 'San Francisco',
-    organization: 'Fake Company, Inc',
-    organizationUnit: 'Engineering',
-    commonName: 'fake.com',
-    altNames: ['alt-fake.com']
-  })
-
-  // Create the server certificate
-  // See https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/ACMPCA.html#issueCertificate-property
-  // - no need to specify CertificateAuthorityArn since you specified it in the constructor
-  // - also waits for the issue certificate task on AWS to complete (this takes around 5+ secs)
-
-  const issueData = await pca.issueCertificate(csrData.csr, {
-    SigningAlgorithm: 'SHA256WITHRSA',
-    Validity: {
-      Type: 'YEARS',
-      Value: 1
-    }
-  })
-
-  // issueData will have { CertificateArn, Certificate, CertificateChain }
-  // You can technically stop here as you have the Certificate + CertificateChain data
-
-  // Get the server certificate (not needed if you've just called issueCertificate()
-  const certData = await pca.getCertificate(issueData.CertificateArn)
-
-  // certData will have { Certificate, CertificateChain }
+  const pca = new PCA(AWS, CA_ARN)
 
   // Get the CA certificate if you need to add it to your trust stores
   const caData = await pca.getCaCertificate()
 
-  // caData will have { Certificate, CertificateChain }
+  console.log('Certificate Authority Data')
+  console.log(caData)
+  console.log('--------')
+
+  // Create the server certificate
+  const reqCertRes = await pca.requestCertificate({
+    DomainName: 'test.int',
+    SubjectAlternativeNames: ['blah.test.int']
+  })
+
+  console.log('Request Certificate Response')
+  console.log(reqCertRes)
+  console.log('--------')
+
+  const cert = await pca.exportCertificate(reqCertRes.CertificateArn, 'password-to-set-for-the-key')
+
+  console.log('Server Certificate')
+  console.log(cert)
 }
 
+sample().then((c) => {
+  process.exit(0)
+}).catch((e) => {
+  console.error(e)
+  process.exit(-1)
+})
 ```
 
 ## Recommended

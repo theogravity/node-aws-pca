@@ -1,5 +1,1 @@
-import PCA from './PCA'
-
-export default {
-  PCA
-}
+export { default as PCA } from './PCA'
